@@ -1,0 +1,36 @@
+[root@jumpserver ansible]# cat ansible.cfg
+[defaults]
+remote_user=root
+inventory=/etc/ansible/hosts
+[privilege_escalation]
+become=true
+[root@jumpserver ansible]# cat hosts
+[muleserver]
+muleserver1
+muleserver2
+muleserver3
+[root@jumpserver ansible]# cat startandstop.yml
+---
+- name:
+  hosts: muleserver
+  become: true
+  tasks:
+  - name: stop httpd
+    service:
+      name: httpd
+      state: stopped
+      enabled: yes
+  - name: service status
+    shell: ps -ef | grep -i httpd  
+    register: hello
+  - debug: msg="{{ hello.stdout }}"
+  - name: start service
+    service:
+      name: httpd
+      state: started
+      enabled: yes
+  - name: service status
+    shell: ps -ef | grep -i httpd
+    register: hello
+  - debug: msg="{{ hello.stdout }}"
+[root@jumpserver ansible]# 
